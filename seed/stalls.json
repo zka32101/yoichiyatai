@@ -1,0 +1,50 @@
+{
+  "yakiNiku": {
+    "name": "焼肉",
+    "description": "焼肉屋台",
+    "baseRevenue": 1000,
+    "category": "meat",
+    "unlockedAtLevel": 0,
+    "synergies": { "veggie": 1.3, "fruit": 1.1 }
+  },
+  "veggie": {
+    "name": "野菜",
+    "description": "野菜屋台",
+    "baseRevenue": 800,
+    "category": "vegetable",
+    "unlockedAtLevel": 0,
+    "synergies": { "yakiNiku": 1.3, "fruit": 1.2 }
+  },
+  "dessert": {
+    "name": "デザート",
+    "description": "デザート屋台",
+    "baseRevenue": 600,
+    "category": "sweet",
+    "unlockedAtLevel": 2,
+    "synergies": { "drink": 1.2, "fruit": 1.1 }
+  },
+  "fruit": {
+    "name": "果物",
+    "description": "果物屋台",
+    "baseRevenue": 700,
+    "category": "fruit",
+    "unlockedAtLevel": 1,
+    "synergies": { "veggie": 1.2, "dessert": 1.1 }
+  },
+  "noodle": {
+    "name": "麺類",
+    "description": "麺類屋台",
+    "baseRevenue": 900,
+    "category": "noodle",
+    "unlockedAtLevel": 1,
+    "synergies": { "yakiNiku": 1.1, "drink": 1.2 }
+  },
+  "drink": {
+    "name": "飲料",
+    "description": "飲料屋台",
+    "baseRevenue": 500,
+    "category": "drink",
+    "unlockedAtLevel": 0,
+    "synergies": { "noodle": 1.2, "dessert": 1.2 }
+  }
+}

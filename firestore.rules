@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // /users/{uid} — 本人のみ読み書き可能
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid)
+        // クライアントから totalRevenue / isPremium を直接改ざんできないようにする
+        && !request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['isPremium']);
+      allow delete: if false;
+    }
+
+    // /dailyRecords/{uid}/records/{date} — 本人のみ読み書き可能
+    match /dailyRecords/{uid}/records/{date} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid);
+      // 確定済みレコードの売上改ざん防止: missionComplete済みは更新不可
+      allow update: if isOwner(uid) && resource.data.missionComplete != true;
+      allow delete: if false;
+    }
+
+    // /stalls/{stallId} — マスタデータ。全員読み取り可、書き込みはサーバー(Admin SDK)のみ
+    match /stalls/{stallId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // /leaderboard/{week}/ranks/{uid} — 読み取りは全員、書き込みはCloud Functionsのみ
+    match /leaderboard/{week}/ranks/{uid} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+  }
+}

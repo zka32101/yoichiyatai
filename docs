@@ -1,0 +1,255 @@
+# 🌙 夜市の屋台街 — Code実装引き継ぎ書 v1.0
+
+作成日: 2026-07-01
+
+---
+
+## Vision / Mission
+
+**Vision**:
+毎日の配置パズルで「昨日より1%良い配置」を求める試行錯誤が、
+結果として街を育てていく実感
+
+**Mission**:
+小さな最適化の積み重ねが、数字で見えるゲーム
+
+---
+
+## OKR（今期・3ヶ月）
+
+```
+KR1: Day7 リテンション 30%+
+KR2: Day30 リテンション 12%+
+KR3: 平均セッション 3分/日
+KR4: 街レベル5到達率 60%+
+```
+
+---
+
+## プロジェクト概要
+
+**アプリ名**: 夜市の屋台街 / Night Market Tycoon
+
+**コアメカニクス**: 3×3 Grid 配置パズル + 日次リセット
+
+**Aha Moment**: 昨日¥5,000の配置を、今日¥7,000に改善できた成功体験
+
+**マネタイズ**: 月¥300（発展スピード2倍 + 屋台種早期解放）
+
+---
+
+## 技術スタック
+
+```
+言語: Dart 3.x
+UI: Flutter 3.x + Riverpod
+DB: Firebase Firestore + Drift
+認証: Firebase Auth（匿名＋Google）
+課金: RevenueCat
+アニメーション: Lottie + Flutter Animate
+計測: Firebase Analytics / Crashlytics / Remote Config
+```
+
+---
+
+## ディレクトリ構成
+
+```
+lib/
+├── main.dart
+├── config/
+│  ├── firebase_config.dart
+│  └── revenucat_config.dart
+├── models/
+│  ├── stall.dart（屋台タイプ）
+│  ├── daily_record.dart（日記録）
+│  ├── user.dart
+│  └── synergy_table.dart
+├── services/
+│  ├── firestore_service.dart
+│  ├── auth_service.dart
+│  ├── revenucat_service.dart
+│  ├── analytics_service.dart
+│  └── placement_calculator.dart（売上計算エンジン）
+├── providers/（Riverpod）
+│  ├── user_provider.dart
+│  ├── daily_placement_provider.dart
+│  ├── leaderboard_provider.dart
+│  └── settings_provider.dart
+├── screens/
+│  ├── splash_screen.dart
+│  ├── tutorial_screen.dart
+│  ├── home_screen.dart（配置UI）
+│  ├── result_screen.dart（前日結果）
+│  ├── leaderboard_screen.dart
+│  ├── shop_screen.dart（課金）
+│  └── settings_screen.dart
+├── widgets/
+│  ├── grid_cell.dart
+│  ├── stall_selector.dart
+│  ├── revenue_display.dart
+│  └── lottie_animation.dart
+├── utils/
+│  ├── analytics_helper.dart
+│  └── date_helper.dart
+└── theme/
+   ├── colors.dart
+   └── typography.dart
+```
+
+---
+
+## 実装順序（推奨・8週間）
+
+### Phase 1: 基盤整備（Week 1-2）
+1. Firebase接続（Auth / Firestore / Analytics）
+2. RevenueCat統合
+3. Riverpod セットアップ
+4. テーマ・カラー定義
+
+### Phase 2: データ層（Week 2-3）
+5. データモデル（Stall / DailyRecord / User / Synergy）
+6. Firestore Security Rules
+7. Drift ローカルDB（オフライン対応）
+8. placement_calculator エンジン（売上計算ロジック）
+
+### Phase 3: Service層（Week 3-4）
+9. FirestoreService（CRUD）
+10. AuthService（匿名ログイン）
+11. RevenueService（課金フロー）
+12. AnalyticsService（イベント計測）
+
+### Phase 4: UI基本（Week 4-5）
+13. SplashScreen
+14. TutorialScreen（配置3タップ）
+15. **GridCell + GridUI**（Aha Momentへの最短動線・最優先）
+16. StallSelector（屋台種選択）
+
+### Phase 5: ホーム画面（Week 5-6）
+17. HomeScreen（Grid + 売上予測表示）
+18. 配置確定ロジック
+19. ResultScreen（前日結果 + ストリーク）
+
+### Phase 6: 拡張機能（Week 6-7）
+20. LeaderboardScreen
+21. ShopScreen（課金）
+22. アニメーション実装（Lottie 5種）
+23. ハプティクスフィードバック
+
+### Phase 7: テスト（Week 7-8）
+24. Unit test（placement_calculator）
+25. Widget test（GridCell / HomeScreen）
+26. Integration test（課金フロー + Aha Moment動線）
+27. CI/CD設定（GitHub Actions）
+
+---
+
+## 実装の注意点
+
+### 優先順位
+
+✅ **最優先**: Aha Moment への最短動線（Grid配置 → 売上計算 → 改善実感）
+
+⚠️ **重要**: 計測3点セット（Analytics / Crashlytics / Remote Config）
+- aha_moment_reached イベントは最初のセッションで送火すること
+
+### コード品質
+
+- APIキー: `.env.local` で管理（ハードコード禁止）
+- Validation: サーバーサイドも必須（クライアント不正を防ぐ）
+- Error Handling: 全API呼び出しにtry-catch
+
+### UI/UX実装
+
+- **Grid**: CustomPaint で60fps（パフォーマンス重視）
+- **タップ領域**: 最小45dp（44pt+マージン）
+- **アニメーション**: Lottie JSON は `assets/animations/` に保存
+- **ダークモード**: `ThemeData` で統一管理
+
+### アニメーション実装順
+
+1. 配置確定時：チェックマーク Lottie
+2. 売上表示：数字カウントアップ（AnimationController）
+3. ストリーク達成：全画面スター爆発
+4. レベルアップ：キャラリアクション
+5. Grid操作：軽いスケールアニメ
+
+### 計測
+
+必須イベント:
+```
+aha_moment_reached    → 配置改善で売上UP時
+daily_placement_confirmed → 毎日配置確定時
+streak_{n}_reached    → 3日, 7日連続
+paywall_viewed        → 課金画面表示
+premium_purchased     → 課金完了
+```
+
+### 課金事故防止
+
+- Integration test で「課金が通る/落ちない」を必ずテスト
+- RevenueCat sandbox で事前検証
+- ダブルタップ保護：確定ボタン連打で2回目以降は無効化
+
+### パフォーマンス
+
+- Firestore: インデックス事前作成（Day1/7/30 リテンション追跡用）
+- Grid描画: RepaintBoundary で最小化
+- API タイムアウト: 10秒・リトライ3回
+
+---
+
+## 添付ファイル
+
+```
+yoichi-yatai-plan_v1_0.md      （企画書）
+yoichi-yatai-design_v1_0.md    （設計書）
+
+参考:
+- Vision / Mission / OKR
+- Firestore スキーマ
+- API仕様
+- 計測イベント一覧
+- UI/UXクオリティ基準（Lottie + ハプティクス）
+```
+
+---
+
+## チェックリスト（実装中）
+
+```
+Phase 1-2:
+□ Firebase接続確認
+□ Riverpod セットアップ
+□ データモデル CRUD成功
+
+Phase 3-4:
+□ placement_calculator で売上計算が正確
+□ GridUI でドラッグ&ドロップが動作
+□ TutorialScreen で必ず黒字
+
+Phase 5-6:
+□ Aha Moment イベント送火確認
+□ ストリーク表示・バッジ表示OK
+□ アニメーション60fps維持
+
+Phase 7:
+□ 課金フロー integration test パス
+□ Day1/7/30 リテンション集計開始
+□ CI/CD でビルド＆配信
+```
+
+---
+
+## 質問・懸念事項
+
+Q. Synergy テーブルの相性倍率はどう決める？
+→ 焼肉×野菜: 1.3倍 / 焼肉×デザート: 1.0倍 (競合) など、
+   実装時に Remote Config で A/B テスト可能に設計済み
+
+Q. 毎日9時のリセット時に客が重い？
+→ Cloud Scheduler で事前計算 → Firestore に書き込み（クライアント側は表示のみ）
+
+Q. オフラインで配置したら起動時に同期される？
+→ Drift でローカル保存 → 起動時に Firestore と差分同期（最新を優先）
+
